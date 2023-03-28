@@ -1,4 +1,3 @@
-using System;
 using Core.Enums;
 using UnityEngine;
 
@@ -7,8 +6,13 @@ namespace Player
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerEntity : MonoBehaviour
     {
+        [Header("Animator")]
+        [SerializeField] private Animator _animator;
+        
         [Header("HorizontalMovement")]
-        [SerializeField] private float _horizontalSpeed;
+        [SerializeField] private float _horizontalSpeed;        
+        [SerializeField] private float _slideSpeed;
+        [SerializeField] private float _speedWhileAttack;
         [SerializeField] private Direction _direction;
 
         [Header("VerticalMovement")] 
@@ -30,11 +34,25 @@ namespace Player
 
         private Rigidbody2D _rigidbody;
         
+        // Jump
         private float _sizeModificator;
         private bool _isJumping;
         private float _startJumpVerticalPosition;
+        
+        // Slide
+        private float _speed;
+        private bool _isSliding;
+        
+        // Attack
+        private bool _isAttacking;
+        
+        // Shadow
         private Vector2 _shadowLocalPosition;
         private float _shadowVerticalPosition;
+
+        // Animation
+        private Vector2 _movement;
+        private AnimationType _currentAnimationType;
 
         void Start()
         {
@@ -45,6 +63,8 @@ namespace Player
             float sizeDifference = _maxSize - _minSize;
             _sizeModificator = sizeDifference / positionDifference;
             UpdateSize();
+
+            _speed = _horizontalSpeed;
         }
 
         private void Update()
@@ -53,21 +73,33 @@ namespace Player
             {
                 UpdateJump();
             }
+
+            UpdateAnimations();
+        }
+
+        private void UpdateAnimations()
+        {
+            PlayAnimation(AnimationType.Idle, true);
+            PlayAnimation(AnimationType.Walk, _movement.magnitude > 0);
+            PlayAnimation(AnimationType.Slide, _movement.magnitude > 0 && _isSliding);
+            PlayAnimation(AnimationType.Jump, _isJumping);
+            PlayAnimation(AnimationType.Attack, _isAttacking);
         }
 
         public void MoveHorizontally(float direction)
         {
+            _movement.x = direction;
             SetDirection(direction);
             Vector2 velocity = _rigidbody.velocity;
-            velocity.x = direction * _horizontalSpeed;
+            velocity.x = direction * _speed;
             _rigidbody.velocity = velocity;
         }
 
-        public void MoveVertically(float direction)
+        public void MoveVertically(float direction, float speed = default)
         {
             if(_isJumping)
                 return;
-            
+            _movement.y = direction;
             SetDirection(direction);
             Vector2 velocity = _rigidbody.velocity;
             velocity.y = direction * _verticalSpeed;
@@ -82,6 +114,15 @@ namespace Player
             _rigidbody.position = new Vector2(_rigidbody.position.x, verticalPosition);
             UpdateSize();
         }
+        
+        public void Slide()
+        {
+            if (!_isAttacking)
+            {
+                _speed = _slideSpeed;
+                _isSliding = true;
+            }
+        }
 
         public void Jump()
         {
@@ -94,6 +135,18 @@ namespace Player
             _rigidbody.gravityScale = _gravityScale * jumpModificator;
             _startJumpVerticalPosition = transform.position.y;
             _shadowVerticalPosition = _shadow.transform.position.y;
+        }
+        
+        public void Attack()
+        {
+            _speed = _speedWhileAttack;
+            _isAttacking = true;
+        }
+        
+        public void StopAttack()
+        {
+            _speed = _horizontalSpeed;
+            _isAttacking = false;
         }
 
         private void UpdateSize()
@@ -143,6 +196,43 @@ namespace Player
             _shadow.color = Color.white;
             _rigidbody.position = new Vector2(_rigidbody.position.x, _startJumpVerticalPosition);
             _rigidbody.gravityScale = 0;
+        }
+        
+        public void StopSlide()
+        {
+            if (_isSliding)
+            {
+                _isSliding = false;
+                _speed = _horizontalSpeed;
+            }
+        }
+
+        private void PlayAnimation(AnimationType animationType, bool active)
+        {
+            if (!active)
+            {
+                if (_currentAnimationType == AnimationType.Idle || _currentAnimationType != animationType)
+                {
+                    return;
+                }
+
+                _currentAnimationType = AnimationType.Idle;
+                PlayAnimation(_currentAnimationType);
+                return;
+            }
+            
+            if (_currentAnimationType >= animationType)
+            {
+                return;
+            }
+
+            _currentAnimationType = animationType;
+            PlayAnimation(_currentAnimationType);
+        }
+
+        private void PlayAnimation(AnimationType animationType)
+        {
+            _animator.SetInteger(nameof(AnimationType), (int) animationType);
         }
     }
 }

@@ -17,6 +17,25 @@ public class InputReader : MonoBehaviour
         {
             _playerEntity.Jump();
         }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift)) 
+        { 
+            _playerEntity.Slide();
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _playerEntity.StopSlide();
+        }
+
+        if (Input.GetButtonDown("Fire1"))
+        {
+            _playerEntity.Attack();
+        }
+        else if (Input.GetButtonUp("Fire1"))
+        {
+            _playerEntity.StopAttack();
+        }
+        
     }
 
     private void FixedUpdate()
