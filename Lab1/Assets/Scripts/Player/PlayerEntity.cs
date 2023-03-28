@@ -1,4 +1,5 @@
 using Core.Enums;
+using Player.PlayerAnimations;
 using UnityEngine;
 
 namespace Player
@@ -7,7 +8,7 @@ namespace Player
     public class PlayerEntity : MonoBehaviour
     {
         [Header("Animator")]
-        [SerializeField] private Animator _animator;
+        [SerializeField] private AnimatorController _animator;
         
         [Header("HorizontalMovement")]
         [SerializeField] private float _horizontalSpeed;        
@@ -34,16 +35,12 @@ namespace Player
 
         private Rigidbody2D _rigidbody;
         
-        // Jump
+        // Actions
         private float _sizeModificator;
-        private bool _isJumping;
         private float _startJumpVerticalPosition;
-        
-        // Slide
         private float _speed;
+        private bool _isJumping;
         private bool _isSliding;
-        
-        // Attack
         private bool _isAttacking;
         
         // Shadow
@@ -52,38 +49,33 @@ namespace Player
 
         // Animation
         private Vector2 _movement;
-        private AnimationType _currentAnimationType;
 
         void Start()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-
+            _speed = _horizontalSpeed;
             _shadowLocalPosition = _shadow.transform.localPosition;
             float positionDifference = _maxVerticalPosition - _minVerticalPosition;
             float sizeDifference = _maxSize - _minSize;
             _sizeModificator = sizeDifference / positionDifference;
             UpdateSize();
-
-            _speed = _horizontalSpeed;
         }
 
         private void Update()
         {
             if (_isJumping)
-            {
                 UpdateJump();
-            }
 
             UpdateAnimations();
         }
 
         private void UpdateAnimations()
         {
-            PlayAnimation(AnimationType.Idle, true);
-            PlayAnimation(AnimationType.Walk, _movement.magnitude > 0);
-            PlayAnimation(AnimationType.Slide, _movement.magnitude > 0 && _isSliding);
-            PlayAnimation(AnimationType.Jump, _isJumping);
-            PlayAnimation(AnimationType.Attack, _isAttacking);
+            _animator.PlayAnimation(AnimationType.Idle, true);
+            _animator.PlayAnimation(AnimationType.Walk, _movement.magnitude > 0);
+            _animator.PlayAnimation(AnimationType.Slide, _movement.magnitude > 0 && _isSliding);
+            _animator.PlayAnimation(AnimationType.Jump, _isJumping);
+            _animator.PlayAnimation(AnimationType.Attack, _isAttacking);
         }
 
         public void MoveHorizontally(float direction)
@@ -99,6 +91,7 @@ namespace Player
         {
             if(_isJumping)
                 return;
+            
             _movement.y = direction;
             SetDirection(direction);
             Vector2 velocity = _rigidbody.velocity;
@@ -106,22 +99,11 @@ namespace Player
             _rigidbody.velocity = velocity;
             
             if (direction == 0)
-            {
                 return;
-            }
 
             float verticalPosition = Mathf.Clamp(transform.position.y, _minVerticalPosition, _maxVerticalPosition);
             _rigidbody.position = new Vector2(_rigidbody.position.x, verticalPosition);
             UpdateSize();
-        }
-        
-        public void Slide()
-        {
-            if (!_isAttacking)
-            {
-                _speed = _slideSpeed;
-                _isSliding = true;
-            }
         }
 
         public void Jump()
@@ -137,44 +119,6 @@ namespace Player
             _shadowVerticalPosition = _shadow.transform.position.y;
         }
         
-        public void Attack()
-        {
-            _speed = _speedWhileAttack;
-            _isAttacking = true;
-        }
-        
-        public void StopAttack()
-        {
-            _speed = _horizontalSpeed;
-            _isAttacking = false;
-        }
-
-        private void UpdateSize()
-        {
-            float verticalDelta = _maxVerticalPosition - transform.position.y;
-            float currentSizeModificator = _minSize + _sizeModificator * verticalDelta;
-            transform.localScale = Vector2.one * currentSizeModificator;
-        }
-
-        private void SetDirection(float direction)
-        {
-            if ((_direction == Direction.Right && direction < 0) ||
-                (_direction == Direction.Left && direction > 0))
-            {
-                Flip();
-            }
-        }
-
-        private void Flip()
-        {
-            transform.Rotate(0, 180, 0);
-            _direction = _direction == Direction.Right ? Direction.Left : Direction.Right;
-            foreach (var cameraPair in _cameras.DirectionalCameras)
-            {
-                cameraPair.Value.enabled = cameraPair.Key == _direction;
-            }
-        }
-
         private void UpdateJump()
         {
             if (_rigidbody.velocity.y < 0 && _rigidbody.position.y <= _startJumpVerticalPosition)
@@ -198,7 +142,40 @@ namespace Player
             _rigidbody.gravityScale = 0;
         }
         
-        public void StopSlide()
+        public void StartAttack()
+        {
+            if (!_animator.PlayAnimation(AnimationType.Attack, true))
+                return;
+            
+            _isAttacking = true;
+            _speed = _speedWhileAttack;
+            _animator.ActionRequested += Attack;
+            _animator.AnimationEnded += EndAttack;
+        }
+
+        private void Attack()
+        {
+            Debug.Log("Attack");
+        }
+        private void EndAttack()
+        {
+            _animator.ActionRequested -= Attack;
+            _animator.AnimationEnded -= EndAttack;
+            _animator.PlayAnimation(AnimationType.Attack, false);
+            _speed = _horizontalSpeed;
+            _isAttacking = false;
+        }
+
+        public void Slide()
+        {
+            if (!_isAttacking)
+            {
+                _speed = _slideSpeed;
+                _isSliding = true;
+            }
+        }
+        
+        public void ResetSlide()
         {
             if (_isSliding)
             {
@@ -207,32 +184,26 @@ namespace Player
             }
         }
 
-        private void PlayAnimation(AnimationType animationType, bool active)
+        private void UpdateSize()
         {
-            if (!active)
-            {
-                if (_currentAnimationType == AnimationType.Idle || _currentAnimationType != animationType)
-                {
-                    return;
-                }
-
-                _currentAnimationType = AnimationType.Idle;
-                PlayAnimation(_currentAnimationType);
-                return;
-            }
-            
-            if (_currentAnimationType >= animationType)
-            {
-                return;
-            }
-
-            _currentAnimationType = animationType;
-            PlayAnimation(_currentAnimationType);
+            float verticalDelta = _maxVerticalPosition - transform.position.y;
+            float currentSizeModificator = _minSize + _sizeModificator * verticalDelta;
+            transform.localScale = Vector2.one * currentSizeModificator;
         }
 
-        private void PlayAnimation(AnimationType animationType)
+        private void SetDirection(float direction)
         {
-            _animator.SetInteger(nameof(AnimationType), (int) animationType);
+            if ((_direction == Direction.Right && direction < 0) ||
+                (_direction == Direction.Left && direction > 0))
+                Flip();
+        }
+
+        private void Flip()
+        {
+            transform.Rotate(0, 180, 0);
+            _direction = _direction == Direction.Right ? Direction.Left : Direction.Right;
+            foreach (var cameraPair in _cameras.DirectionalCameras)
+                cameraPair.Value.enabled = cameraPair.Key == _direction;
         }
     }
 }
