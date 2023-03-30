@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using InputReader;
+using UnityEngine;
 
 namespace Player
 {
@@ -7,7 +9,7 @@ namespace Player
     {
         private readonly PlayerEntity _playerEntity;
         private readonly List<IEntityInputSource> _inputSources;
-        
+
         public PlayerBrain(PlayerEntity playerEntity, List<IEntityInputSource> inputSources)
         {
             _playerEntity = playerEntity;
@@ -21,7 +23,9 @@ namespace Player
             if (IsJump)
                 _playerEntity.Jump();
             if (IsAttack)
-                _playerEntity.StartAttack();
+            {
+            }
+            //_playerEntity.StartAttack();
 
             foreach (var inputSource in _inputSources)
                 inputSource.ResetOneTimeActions();
@@ -32,24 +36,20 @@ namespace Player
             foreach (var inputSource in _inputSources)
             {
                 if (inputSource.HorizontalDirection == 0)
-                {
                     continue;
-                }
 
                 return inputSource.HorizontalDirection;
             }
 
             return 0;
         }
-        
+
         private float GetVerticalDirection()
         {
             foreach (var inputSource in _inputSources)
             {
                 if (inputSource.VerticalDirection == 0)
-                {
                     continue;
-                }
 
                 return inputSource.VerticalDirection;
             }
