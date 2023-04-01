@@ -25,14 +25,19 @@ namespace Player
             _playerEntity.MoveHorizontally(GetHorizontalDirection());
             _playerEntity.MoveVertically(GetVerticalDirection());
             if (IsJump)
+            {
                 _playerEntity.Jump();
+            }
+
             if (IsAttack)
             {
+                // TODO: _playerEntity.StartAttack();
             }
-            // TODO: _playerEntity.StartAttack();
 
             foreach (var inputSource in _inputSources)
+            {
                 inputSource.ResetOneTimeActions();
+            }
         }
 
         private float GetHorizontalDirection()

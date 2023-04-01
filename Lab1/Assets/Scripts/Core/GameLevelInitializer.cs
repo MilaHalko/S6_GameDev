@@ -4,7 +4,6 @@ using Core.Services.Updater;
 using InputReader;
 using Player;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace Core
 {

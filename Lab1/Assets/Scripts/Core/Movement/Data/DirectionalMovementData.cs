@@ -8,9 +8,11 @@ namespace Core.Movement.Data
     public class DirectionalMovementData
     {
         [field: SerializeField] public float HorizontalSpeed { get; private set; }
-        [field: SerializeField] public float SlideSpeed { get; private set; }
-        [field: SerializeField] public float SpeedWhileAttack { get; private set; }
         [field: SerializeField] public float VerticalSpeed { get; private set; }
+
+        // TODO:
+        // [field: SerializeField] public float SlideSpeed { get; private set; }
+        // [field: SerializeField] public float SpeedWhileAttack { get; private set; }
         
         [field: SerializeField] public Direction Direction { get; private set; }
         [field: SerializeField] public float MinSize { get; private set; }

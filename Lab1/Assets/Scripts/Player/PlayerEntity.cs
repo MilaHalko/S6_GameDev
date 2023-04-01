@@ -19,7 +19,7 @@ namespace Player
         private DirectionalMover _directionalMover;
         private Jumper _jumper;
 
-        // Actions
+        // Actions TODO: 
         private bool _isSliding;
         private bool _isAttacking;
 
@@ -65,7 +65,7 @@ namespace Player
 
         public void Jump() => _jumper.Jump();
 
-        /*
+        /* TODO:
         public void StartAttack()
         {
             if (!_animator.PlayAnimation(AnimationType.Attack, true))
