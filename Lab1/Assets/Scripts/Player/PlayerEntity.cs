@@ -1,7 +1,8 @@
 using Core.Animation;
-using Core.Movement.Controller;
-using Core.Movement.Data;
 using Core.Tools;
+using Movement.Controller;
+using Movement.Data;
+using StatsSystem;
 using UnityEngine;
 
 namespace Player
@@ -23,11 +24,11 @@ namespace Player
         private bool _isSliding;
         private bool _isAttacking;
 
-        void Start()
+        public void Initialize(IStatValueGiver statValueGiver)
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-            _directionalMover = new DirectionalMover(_rigidbody, _directionalMovementData);
-            _jumper = new Jumper(_rigidbody, _jumpData, _directionalMovementData.MaxSize);
+            _directionalMover = new DirectionalMover(_rigidbody, _directionalMovementData, statValueGiver);
+            _jumper = new Jumper(_rigidbody, _jumpData, _directionalMovementData.MaxSize, statValueGiver);
         }
 
         private void Update()

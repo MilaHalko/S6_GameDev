@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.Services.Updater;
 using InputReader;
 using Player;
+using StatsSystem;
 using UnityEngine;
 
 namespace Core
@@ -39,6 +40,7 @@ namespace Core
                _gameUIInputView,
                _externalDevicesInput
             });
+            _disposables.Add(_playerSystem);
         }
 
         private void Update()
