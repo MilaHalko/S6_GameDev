@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Core.Services.Updater;
 using InputReader;
 using Player;
-using StatsSystem;
 using UnityEngine;
 
 namespace Core
