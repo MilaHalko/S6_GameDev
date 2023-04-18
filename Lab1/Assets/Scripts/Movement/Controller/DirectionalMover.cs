@@ -1,4 +1,6 @@
-﻿using Core.Enum;
+﻿
+
+using Core.Enum;
 using Core.StatsSystem.Enum;
 using Movement.Data;
 using StatsSystem;
