@@ -13,23 +13,25 @@ namespace Movement.Controller
         private readonly DirectionalMovementData _directionalMovementData;
         private readonly float _sizeModificator;
         private readonly IStatValueGiver _statValueGiver;
-        
+
         private Vector2 _movement;
 
         public Direction Direction { get; private set; }
         public bool IsMoving => _movement.magnitude > 0;
-        
-        public DirectionalMover(Rigidbody2D rigidbody, DirectionalMovementData directionalMovementData, IStatValueGiver statValueGiver)
+
+        public DirectionalMover(Rigidbody2D rigidbody, DirectionalMovementData directionalMovementData,
+            IStatValueGiver statValueGiver)
         {
             _rigidbody = rigidbody;
             _transform = rigidbody.transform;
             _directionalMovementData = directionalMovementData;
             _statValueGiver = statValueGiver;
-            
-            float positionDifference = _directionalMovementData.MaxVerticalPosition - _directionalMovementData.MinVerticalPosition;
+
+            float positionDifference = _directionalMovementData.MaxVerticalPosition -
+                                       _directionalMovementData.MinVerticalPosition;
             float sizeDifference = _directionalMovementData.MaxSize - _directionalMovementData.MinSize;
             _sizeModificator = sizeDifference / positionDifference;
-            
+
             UpdateSize();
         }
 
@@ -49,15 +51,16 @@ namespace Movement.Controller
             Vector2 velocity = _rigidbody.velocity;
             velocity.y = direction * _statValueGiver.GetStatValue(StatType.Speed) / 2;
             _rigidbody.velocity = velocity;
-            
+
             if (direction == 0)
                 return;
 
-            float verticalPosition = Mathf.Clamp(_rigidbody.position.y, _directionalMovementData.MinVerticalPosition, _directionalMovementData.MaxVerticalPosition);
+            float verticalPosition = Mathf.Clamp(_rigidbody.position.y, _directionalMovementData.MinVerticalPosition,
+                _directionalMovementData.MaxVerticalPosition);
             _rigidbody.position = new Vector2(_rigidbody.position.x, verticalPosition);
             UpdateSize();
         }
-        
+
         private void UpdateSize()
         {
             float verticalDelta = _directionalMovementData.MaxVerticalPosition - _transform.position.y;
@@ -71,7 +74,7 @@ namespace Movement.Controller
                 (Direction == Direction.Left && direction > 0))
                 Flip();
         }
-        
+
         private void Flip()
         {
             _transform.Rotate(0, 180, 0);

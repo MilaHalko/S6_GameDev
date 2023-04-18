@@ -1,4 +1,4 @@
-﻿namespace Core.Enums.Item
+﻿namespace Items.Enum
 {
     public enum ItemRarity
     {

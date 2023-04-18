@@ -19,18 +19,18 @@ namespace StatsSystem
             ProjectUpdater.Instance.UpdateCalled += OnUpdate;
         }
 
-        public float GetStatValue(StatType statType) => _currentStats.Find(stat => stat.Type == statType);
+        public float GetStatValue(StatType statType) => _currentStats.Find(stat => stat.StatType == statType);
 
         public void ProcessModificator(StatModificator modificator)
         {
-            var statToChange = _currentStats.Find(stat => stat.Type == modificator.Stat.Type);
+            var statToChange = _currentStats.Find(stat => stat.StatType == modificator.Stat.StatType);
             
             if (statToChange == null)
             {
                 return;
             }
 
-            var addedValue = modificator.StatModificatorType == StatModificatorType.Additive
+            var addedValue = modificator.Type == StatModificatorType.Additive
                 ? statToChange + modificator.Stat
                 : statToChange * modificator.Stat;
             
@@ -46,7 +46,7 @@ namespace StatsSystem
             }
             else
             {
-                var addedStat = new Stat(modificator.Stat.Type, -addedValue);
+                var addedStat = new Stat(modificator.Stat.StatType, -addedValue);
                 var tempModificator = 
                     new StatModificator(addedStat, StatModificatorType.Additive, modificator.Duration, Time.time);
                 _activeModificators.Add(tempModificator);

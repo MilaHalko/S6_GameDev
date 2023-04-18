@@ -1,6 +1,6 @@
 ﻿using System;
-using Core.Enums;
 using Core.Enums.Item;
+using Items.Enum;
 using UnityEngine;
 
 namespace Items.Data

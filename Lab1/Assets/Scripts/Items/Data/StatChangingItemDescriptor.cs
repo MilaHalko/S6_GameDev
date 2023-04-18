@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.Enums;
 using Core.Enums.Item;
+using Items.Enum;
 using StatsSystem;
 using UnityEngine;
 
