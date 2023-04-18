@@ -1,4 +1,4 @@
-﻿namespace StatsSystem.Enum
+﻿namespace Core.StatsSystem.Enum
 {
     public enum StatModificatorType
     {

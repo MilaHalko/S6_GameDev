@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Services.Updater;
-using StatsSystem.Enum;
+using Core.StatsSystem.Enum;
 using UnityEngine;
 
 namespace StatsSystem
@@ -63,7 +63,7 @@ namespace StatsSystem
             }
 
             var expiredModifications =
-                _activeModificators.Where(modificator => modificator.StartTime + modificator.Duration >= Time.time);
+                _activeModificators.Where(modificator => modificator.StartTime + modificator.Duration <= Time.time);
 
             foreach (var modificator in expiredModifications)
             {

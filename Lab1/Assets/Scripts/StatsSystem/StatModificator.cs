@@ -1,5 +1,5 @@
 ﻿using System;
-using StatsSystem.Enum;
+using Core.StatsSystem.Enum;
 using UnityEngine;
 
 namespace StatsSystem

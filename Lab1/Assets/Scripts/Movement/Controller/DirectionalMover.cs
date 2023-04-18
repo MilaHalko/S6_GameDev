@@ -1,7 +1,7 @@
-﻿using Core.Enums;
+﻿using Core.Enum;
+using Core.StatsSystem.Enum;
 using Movement.Data;
 using StatsSystem;
-using StatsSystem.Enum;
 using UnityEngine;
 
 namespace Movement.Controller

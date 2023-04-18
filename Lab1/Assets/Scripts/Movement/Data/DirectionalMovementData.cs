@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.Enums;
+using Core.Enum;
 using UnityEngine;
 
 namespace Movement.Data

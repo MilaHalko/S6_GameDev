@@ -1,4 +1,4 @@
-﻿using StatsSystem.Enum;
+﻿using Core.StatsSystem.Enum;
 
 namespace StatsSystem
 {
